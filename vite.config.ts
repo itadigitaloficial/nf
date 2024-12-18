@@ -10,8 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@remix-run/router': 'react-router-dom'
+      '@': path.resolve(__dirname, './src')
     }
   }
 })
