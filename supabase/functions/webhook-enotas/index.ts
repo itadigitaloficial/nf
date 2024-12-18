@@ -1,0 +1,94 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0";
+import { WebhookRequest, WebhookResponse } from "./types.ts";
+import { 
+  handleEmpresaCadastrada, 
+  handleNotaFiscalEmitida, 
+  handleNotaFiscalCancelada,
+  logWebhookEvent
+} from "./handlers.ts";
+
+serve(async (req: Request) => {
+  try {
+    // Configurar cliente Supabase
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Variáveis de ambiente do Supabase não configuradas');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Processar payload
+    const payload: WebhookRequest = await req.json();
+    logWebhookEvent(payload.evento, payload.data);
+
+    let response: WebhookResponse = { success: true };
+
+    // Processar evento
+    switch (payload.evento) {
+      case 'EmpresaCadastrada':
+        const empresaResult = await handleEmpresaCadastrada(supabase, payload);
+        if (empresaResult.error) {
+          throw new Error(`Erro ao processar cadastro de empresa: ${empresaResult.error.message}`);
+        }
+        break;
+
+      case 'NotaFiscalEmitida':
+        const notaEmitidaResult = await handleNotaFiscalEmitida(supabase, payload);
+        if (notaEmitidaResult.error) {
+          throw new Error(`Erro ao processar emissão de nota: ${notaEmitidaResult.error.message}`);
+        }
+        break;
+
+      case 'NotaFiscalCancelada':
+        const notaCanceladaResult = await handleNotaFiscalCancelada(supabase, payload);
+        if (notaCanceladaResult.error) {
+          throw new Error(`Erro ao processar cancelamento de nota: ${notaCanceladaResult.error.message}`);
+        }
+        break;
+
+      default:
+        console.warn('Evento não tratado:', payload.evento);
+        response = { 
+          success: false, 
+          error: `Evento não suportado: ${payload.evento}` 
+        };
+    }
+
+    return new Response(
+      JSON.stringify(response),
+      { 
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        },
+        status: response.success ? 200 : 400
+      }
+    );
+
+  } catch (error) {
+    console.error('Erro ao processar webhook:', error);
+    
+    const response: WebhookResponse = {
+      success: false,
+      error: error.message
+    };
+
+    return new Response(
+      JSON.stringify(response),
+      { 
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        },
+        status: 500
+      }
+    );
+  }
+});

@@ -1,0 +1,25 @@
+[functions]
+[functions.webhook-enotas]
+verify_jwt = false
+
+[functions.webhook-enotas.import_map]
+imports = {
+  "std/" = "https://deno.land/std@0.168.0/",
+  "@supabase/supabase-js" = "https://esm.sh/@supabase/supabase-js@2.21.0"
+}
+
+[functions.webhook-enotas.environment]
+SUPABASE_URL = "sua_url_do_supabase"
+SUPABASE_SERVICE_ROLE_KEY = "sua_chave_de_servico"
+
+[[functions.webhook-enotas.headers]]
+name = "Access-Control-Allow-Origin"
+value = "*"
+
+[[functions.webhook-enotas.headers]]
+name = "Access-Control-Allow-Methods"
+value = "POST, OPTIONS"
+
+[[functions.webhook-enotas.headers]]
+name = "Access-Control-Allow-Headers"
+value = "Content-Type, Authorization"

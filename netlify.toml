@@ -1,0 +1,18 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "20.10.0"
+  VITE_APP_URL = "https://emissor-nf-ita.netlify.app"
+
+[context.production.environment]
+  VITE_SUPABASE_URL = "https://knvgprwdfizvelroztkf.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtudmdwcndkZml6dmVscm96dGtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0Mzg5ODUsImV4cCI6MjA1MDAxNDk4NX0.qSxqX86qL3DROdhdfPhehkWQfBK_NYa-MdIw22iSonU"
+  VITE_SUPABASE_FUNCTIONS_URL = "https://knvgprwdfizvelroztkf.supabase.co/functions/v1"
+  VITE_ENOTAS_API_KEY = "NjI1ZDRjNmMtNzg4Ny00MTM1LWFlZGUtYjA0ODIyMjEwYjAw"
