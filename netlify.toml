@@ -1,5 +1,9 @@
 [build]
-  command = "CI=false npm install --legacy-peer-deps && npm run build"
+  command = """
+    npm install -g npm@10.2.4 &&
+    npm install --legacy-peer-deps &&
+    npm run build
+  """
   publish = "dist"
 
 [[redirects]]
@@ -9,7 +13,8 @@
 
 [build.environment]
   NODE_VERSION = "20.10.0"
-  NPM_VERSION = "10.2.4"
+  NPM_FLAGS = "--no-audit --no-fund --legacy-peer-deps"
+  NETLIFY_USE_YARN = "false"
   CI = "false"
   VITE_APP_URL = "https://emissor-nf-ita.netlify.app"
 
